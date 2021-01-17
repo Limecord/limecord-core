@@ -1,8 +1,9 @@
 package main
 
 import (
-	"fmt"
+	"github.com/gin-gonic/autotls"
 	"github.com/gin-gonic/gin"
+	"golang.org/x/crypto/acme/autocert"
 	"limecord-core/handlers"
 	"limecord-core/middleware"
 	"limecord-core/utils"
@@ -14,6 +15,8 @@ import (
 var (
 	// The port that the http server will listen on
 	SERVER_PORT = GetConfigVar("PORT", "8080")
+	// the domain name of the discord instance
+	SERVER_HOSTNAME = GetConfigVar("HOSTNAME", "localhost")
 )
 
 // Get configuration variables from the environment, or fallback to the default value
@@ -45,8 +48,14 @@ func main() {
 	// register our user handlers
 	handlers.RegisterUser(apiGroup)
 
+	// setup https for localhost, gotta change it in the future
+	autoCertMgr := autocert.Manager{
+		Prompt:     autocert.AcceptTOS,
+		HostPolicy: autocert.HostWhitelist(SERVER_HOSTNAME),
+	}
+
 	// Start the api server, on the port specified in the environment, if errors log the error
-	if err := httpServer.Run(fmt.Sprintf(":%s", SERVER_PORT)); err != nil {
+	if err := autotls.RunWithManager(httpServer, &autoCertMgr); err != nil {
 		log.Fatal(err)
 	}
 }
