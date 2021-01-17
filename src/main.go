@@ -38,7 +38,12 @@ func main() {
 	})
 
 	apiGroup := httpServer.Group("/api/:version", middleware.APIVersionMiddleware)
+
+	// register our tracking handlers
 	handlers.RegisterTracking(apiGroup)
+
+	// register our user handlers
+	handlers.RegisterUser(apiGroup)
 
 	// Start the api server, on the port specified in the environment, if errors log the error
 	if err := httpServer.Run(fmt.Sprintf(":%s", SERVER_PORT)); err != nil {
