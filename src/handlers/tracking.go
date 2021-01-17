@@ -10,7 +10,14 @@ func science(c *gin.Context) {
 	c.AbortWithStatus(204)
 }
 
+func experiments(c *gin.Context) {
+	c.JSON(200, gin.H{
+		"assignments": []interface{}{},
+	})
+}
+
 // register the routers for the tracking module
 func RegisterTracking(router *gin.RouterGroup) {
 	router.POST("/science", science)
+	router.GET("/experiments", experiments)
 }

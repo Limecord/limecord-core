@@ -2,14 +2,15 @@ package main
 
 import (
 	"fmt"
-	"github.com/gin-gonic/gin"
-	"github.com/gin-contrib/cors"
 	"limecord-core/handlers"
 	"limecord-core/middleware"
 	"limecord-core/utils"
 	"log"
 	"os"
 	"strings"
+
+	"github.com/gin-contrib/cors"
+	"github.com/gin-gonic/gin"
 )
 
 var (
@@ -20,7 +21,7 @@ var (
 	//
 	SERVER_HTTPS_CERT = GetConfigVar("HTTPS_CERT", "./test/server.crt")
 	//
-	SERVER_HTTPS_KEY = GetConfigVar("HTTPS_KEY","./test/server.pem")
+	SERVER_HTTPS_KEY = GetConfigVar("HTTPS_KEY", "./test/server.pem")
 )
 
 // Get configuration variables from the environment, or fallback to the default value
@@ -59,6 +60,9 @@ func main() {
 
 	// register our user handlers
 	handlers.RegisterUser(apiGroup)
+
+	handlers.RegisterAuth(apiGroup)
+	handlers.RegisterInvites(apiGroup)
 
 	// Start the api server, on the port specified in the environment, if errors log the error
 	err := httpServer.RunTLS(fmt.Sprintf(":%s", SERVER_PORT),
