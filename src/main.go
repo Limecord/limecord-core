@@ -1,9 +1,9 @@
 package main
 
 import (
-	"github.com/gin-gonic/autotls"
+	"fmt"
 	"github.com/gin-gonic/gin"
-	"golang.org/x/crypto/acme/autocert"
+	"github.com/gin-contrib/cors"
 	"limecord-core/handlers"
 	"limecord-core/middleware"
 	"limecord-core/utils"
@@ -17,6 +17,10 @@ var (
 	SERVER_PORT = GetConfigVar("PORT", "8080")
 	// the domain name of the discord instance
 	SERVER_HOSTNAME = GetConfigVar("HOSTNAME", "localhost")
+	//
+	SERVER_HTTPS_CERT = GetConfigVar("HTTPS_CERT", "./test/server.crt")
+	//
+	SERVER_HTTPS_KEY = GetConfigVar("HTTPS_KEY","./test/server.pem")
 )
 
 // Get configuration variables from the environment, or fallback to the default value
@@ -34,6 +38,14 @@ func GetConfigVar(name string, def string) string {
 func main() {
 	// create the gin server
 	httpServer := gin.New()
+	// allow all through cors by default
+	corsConfig := cors.DefaultConfig()
+	corsConfig.AllowAllOrigins = true
+	corsConfig.AllowWildcard = true
+	corsConfig.AllowWebSockets = true
+	corsConfig.AllowCredentials = true
+	corsConfig.AddAllowHeaders("*")
+	httpServer.Use(cors.New(corsConfig))
 
 	// on 404 not found
 	httpServer.NoRoute(func(c *gin.Context) {
@@ -48,14 +60,12 @@ func main() {
 	// register our user handlers
 	handlers.RegisterUser(apiGroup)
 
-	// setup https for localhost, gotta change it in the future
-	autoCertMgr := autocert.Manager{
-		Prompt:     autocert.AcceptTOS,
-		HostPolicy: autocert.HostWhitelist(SERVER_HOSTNAME),
-	}
-
 	// Start the api server, on the port specified in the environment, if errors log the error
-	if err := autotls.RunWithManager(httpServer, &autoCertMgr); err != nil {
+	err := httpServer.RunTLS(fmt.Sprintf(":%s", SERVER_PORT),
+		SERVER_HTTPS_CERT, SERVER_HTTPS_KEY)
+	// this is disabled as it gives us an invalid response
+	// err := autotls.RunWithManager(httpServer, &autoCertMgr);
+	if err != nil {
 		log.Fatal(err)
 	}
 }
