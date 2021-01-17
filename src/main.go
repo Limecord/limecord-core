@@ -63,6 +63,7 @@ func main() {
 
 	handlers.RegisterAuth(apiGroup)
 	handlers.RegisterInvites(apiGroup)
+	handlers.RegisterGateway(apiGroup)
 
 	// Start the api server, on the port specified in the environment, if errors log the error
 	err := httpServer.RunTLS(fmt.Sprintf(":%s", SERVER_PORT),
