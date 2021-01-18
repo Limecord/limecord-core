@@ -2,6 +2,7 @@ package main
 
 import (
 	"fmt"
+	"limecord-core/gateway"
 	"limecord-core/handlers"
 	"limecord-core/middleware"
 	"limecord-core/utils"
@@ -62,8 +63,11 @@ func main() {
 	handlers.RegisterUser(apiGroup)
 
 	handlers.RegisterAuth(apiGroup)
+
 	handlers.RegisterInvites(apiGroup)
-	handlers.RegisterGateway(apiGroup)
+
+	// register our gateway
+	gateway.RegisterGateway(apiGroup)
 
 	// Start the api server, on the port specified in the environment, if errors log the error
 	err := httpServer.RunTLS(fmt.Sprintf(":%s", SERVER_PORT),
