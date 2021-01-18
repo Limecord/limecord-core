@@ -32,18 +32,15 @@ func (p *GatewayPacket) WritePacketChunked(conn *Connection, data []byte, chunkS
 
 	for i := 0; i < totalSize; {
 		chunk := data[i:min(i + chunkSize, totalSize)]
+		fmt.Printf("write: %v\n", chunk)
 		if err := p.Write(conn, chunk); err != nil {
-			fmt.Printf("err: %v\n", err)
 			return err
 		}
-
-		fmt.Printf("Write chunk: %v\n", chunk)
 
 		i += chunkSize
 	}
 
 	fmt.Printf("totalSize: %d, chunkSize: %d\n", totalSize, chunkSize)
-	fmt.Printf("send %d chunks to client\n", totalSize / chunkSize)
 	return nil
 }
 func (p *GatewayPacket) WritePacket(conn *Connection) error {
@@ -73,8 +70,8 @@ func (p *GatewayPacket) WritePacket(conn *Connection) error {
 		}
 
 		if written > 0 {
-			chunk0 := compressed[:1]
-			chunk1 := compressed[1:]
+			chunk0 := compressed[:2]
+			chunk1 := compressed[2:]
 
 			err = p.WritePacketChunked(conn, chunk0, 1024)
 			if err == nil {
