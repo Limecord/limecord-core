@@ -126,7 +126,8 @@ func (c *Connection) ProcessPacket(packet *GatewayPacket) error {
 		break
 
 	case OP_IDENTIFY:
-		c.compressBlocks = true
+		// this should be determined by the identify packet
+		c.compressBlocks = false
 		break
 
 	default:
